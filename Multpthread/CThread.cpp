@@ -22,6 +22,8 @@ void CThread::ThreadSleep(unsigned long long iTime){
     timeWait.tv_sec = time(NULL) + 3;
     timeWait.tv_nsec = 0;
 
+
+
     pthread_mutex_lock(&pthread_mutex);
     pthread_cond_timedwait(&pthread_cond, &pthread_mutex, &timeWait);
     pthread_mutex_unlock(&pthread_mutex);

@@ -7,7 +7,7 @@
 #include <pthread.h>
 #include <iostream>
 #include <unistd.h>
-//#include <sys/eventfd.h>
+#include <sys/eventfd.h>
 using namespace std;
 
 enum PTHREAD_STATUS
