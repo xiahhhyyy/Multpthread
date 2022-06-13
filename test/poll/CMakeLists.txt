@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.0)
+project(poll_test)
+set(CMAKE_CXX_STANDARD 11)
+add_executable(poll_test main.cpp)
+target_link_libraries(poll_test libpthread.so)
