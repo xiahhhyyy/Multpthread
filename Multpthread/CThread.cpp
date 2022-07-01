@@ -3,7 +3,7 @@
 //
 
 #include "CThread.h"
-#include "time.h"
+#include <ctime>
 
 CThread::CThread(){
     pthread_status = PTHREAD_NOT_CREATE;
@@ -18,8 +18,8 @@ CThread::~CThread(){
 }
 
 void CThread::ThreadSleep(unsigned long long iTime){
-    timespec timeWait;
-    timeWait.tv_sec = time(NULL) + 3;
+    timespec timeWait{};
+    timeWait.tv_sec = time(nullptr) + 3;
     timeWait.tv_nsec = 0;
 
 

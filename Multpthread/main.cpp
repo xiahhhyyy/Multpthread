@@ -1,4 +1,7 @@
 #include "CThread.h"
+#include <cerrno>
+#include <cstdio>
+#include <cstring>
 
 void* func1(void* param){
     auto* pThread = (CThread*) param;
@@ -13,6 +16,11 @@ void* func1(void* param){
 
 int main()
 {
+    FILE *fd = fopen("/root/file_test.txt", "rb");
+    if(nullptr == fd){
+        cout << "错误号 = " << errno << endl;
+        cout << "错误信息 = " << strerror(errno) << endl;
+    }
     std::cout << "Hello, World!" << std::endl;
     auto* pThread = new CThread();
     pThread->CreateThread(func1, pThread);
