@@ -3,4 +3,5 @@ project(xiahhhyyy)
 set(CMAKE_CXX_STANDARD 11)
 add_subdirectory(Multpthread)
 add_subdirectory(test)
+add_subdirectory(DesignPattern)
 
