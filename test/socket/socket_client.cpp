@@ -20,7 +20,7 @@ void socket_client::set_addr(const char *ip, short port)
     m_server_addr.sin_port = htons(port);
 
 
-}1
+}
 
 bool socket_client::connect_server()const
 {

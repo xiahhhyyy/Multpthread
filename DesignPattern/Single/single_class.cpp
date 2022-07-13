@@ -3,8 +3,6 @@
 //
 
 #include "single_class.h"
-
-#include <utility>
 single_class single_class::obj;
 
 single_class *single_class::get_obj(){
