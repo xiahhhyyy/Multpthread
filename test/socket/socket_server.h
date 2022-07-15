@@ -2,7 +2,7 @@
 // Created by Xhy_m on 2022/6/15.
 //
 
-#ifndef XIAHHHYYY_SOCKET_SERVER_H
+#ifndef XIAHHHYYY_COMMON_SOCKET_SERVER_H
 #define XIAHHHYYY_SOCKET_SERVER_H
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -36,4 +36,4 @@ private:
 };
 
 
-#endif //XIAHHHYYY_SOCKET_SERVER_H
+#endif //XIAHHHYYY_COMMON_SOCKET_SERVER_H
