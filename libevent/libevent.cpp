@@ -32,11 +32,27 @@ bool libevent::init_socket()
         return false;
     }
 
-    ret = listen(m_socket_fd, SOMAXCONN);
+    ret = listen(m_socket_fd, 10);
     if(ret != 0){
         cout << strerror(errno) << __LINE__ <<  endl;
         return false;
     }
+    return true;
+}
+
+bool libevent::get_src_file(){
+    string filepath = "/root/src_file.tar.gz";
+    int fd = open(filepath.c_str(), O_RDONLY);
+    struct stat st{};
+    if( 0 != fstat(fd, &st)){
+        cout << "fstat is error:" << strerror(errno) << endl;
+        return false;
+    }
+
+    m_file_msg.file_path = filepath;
+    m_file_msg.fd = fd;
+    m_file_msg.offset = 0;
+    m_file_msg.file_size = st.st_size;
     return true;
 }
 
@@ -46,7 +62,18 @@ void libevent::start()
         return;
     }
 
-    struct event *ev = event_new(ev_base, m_socket_fd, EV_READ | EV_PERSIST, libevent::callback_func, this);
+    if(!get_src_file()){
+        return;
+    }
+
+
+    my_argc data{};
+    data.ev_base = ev_base;
+    data.m_socket_fd = m_socket_fd;
+    data.src_file = m_file_msg;
+    struct event *ev = event_new(ev_base, m_socket_fd, EV_READ | EV_PERSIST, libevent::callback_func, &data);
+    cout << "m_socket_fd = " << m_socket_fd <<endl;
+
     event_add(ev, nullptr);
     event_base_dispatch(ev_base);
 
@@ -55,8 +82,11 @@ void libevent::start()
 
 void libevent::callback_func(int fd, short event, void *arg)
 {
-    auto obj = (my_argc*) arg;
-    if(fd == obj->m_socket_fd && (event & EV_READ)){
+    cout << "callback_func fd=" << fd << endl;
+    cout << "eee=" << event << endl;
+    auto data = (struct my_argc*) arg;
+    cout << "socket_fd" << data->m_socket_fd << endl;
+/*    if(fd == obj->m_socket_fd && (event & EV_READ)){
         sockaddr_in client_address{};
         socklen_t len;
         int connect_fd = accept(obj->m_socket_fd, (sockaddr*)&client_address, &len);
@@ -97,6 +127,74 @@ void libevent::callback_func(int fd, short event, void *arg)
     if(is_end) return;
     struct event *ev = event_new(obj->ev_base, fd, type, libevent::callback_func, obj);
     obj->ev = ev;
-    event_add(obj->ev, nullptr);
+    event_add(obj->ev, nullptr);*/
+    if(data->m_socket_fd == fd && (event & EV_READ)){
+        cout << 111 << endl;
+        sockaddr_in client_address{};
+        socklen_t len = sizeof(sockaddr_in);
+        int connect_fd = accept(fd, (sockaddr*)&client_address, &len);
+        cout << "connect_fd = " << connect_fd << endl;
+        if(connect_fd == -1){
+            cout << "accept error:" << strerror(errno) << endl;
+            return;
+        }
+
+        struct bufferevent *bev = bufferevent_socket_new(data->ev_base, connect_fd, BEV_OPT_CLOSE_ON_FREE);
+        //bufferevent_setwatermark(bev, EV_WRITE, 1024*1024*5, 0);
+
+
+        bufferevent_setcb(bev, read_cb, write_cb, event_cb, &data->src_file);
+        bufferevent_enable(bev, EV_READ | EV_WRITE);
+        struct timeval time_out{};
+        time_out.tv_sec = 3;
+        bufferevent_set_timeouts(bev, nullptr, &time_out);
+    }
+}
+
+void libevent::write_cb(struct bufferevent *bev, void *arg)
+{
+    auto src_file = (file_msg*)arg;
+    if(src_file->offset >= src_file->file_size){
+        cout << "offset > filesize" << endl;
+        bufferevent_free(bev);
+        return;
+    }
+    cout << "offset = " << src_file->offset << endl;
+    size_t length = 10*1024*1024;
+    length = min(length, src_file->file_size - src_file->offset);
+
+    struct evbuffer *evb = evbuffer_new();
+    struct evbuffer_file_segment *evb_seg = evbuffer_file_segment_new(src_file->fd, src_file->offset, length, 0);
+    evbuffer_add_file_segment(evb, evb_seg, 0, length);
+    bufferevent_write_buffer(bev, evb);
+
+    src_file->offset += length;
+    evbuffer_free(evb);
+    evbuffer_file_segment_free(evb_seg);
+}
+
+void libevent::read_cb(struct bufferevent *bev, void *arg)
+{
+    cout << "read event" << endl;
+    char buffer_tmp[128] = {0};
+    bufferevent_read(bev, buffer_tmp, 127);
+    cout << "get client data: " << buffer_tmp << endl;
+    //sleep(1);
+}
+
+void libevent::event_cb(struct bufferevent *bev, short events, void *arg)
+{
+    cout << 1111 << endl;
+    //查错的
+    if(events & BEV_EVENT_EOF)
+    {
+        printf("connection closed\n");
+    }else if(events & BEV_EVENT_ERROR)
+    {
+        printf("some error\n");
+    }
+    //出错了就把事件给释放掉
+    bufferevent_free(bev);
+    printf("bufferevent 资源被释放\n");
 }
 

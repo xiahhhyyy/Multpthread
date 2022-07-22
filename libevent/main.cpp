@@ -3,12 +3,14 @@
 //
 
 #include "libevent.h"
+#include "signal.h"
 
 using namespace std;
 
 
 int main()
 {
+    signal(SIGPIPE, SIG_IGN);
     libevent obj;
     obj.start();
 

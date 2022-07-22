@@ -14,8 +14,32 @@
 #include "cstring"
 #include "string"
 #include "iostream"
+#include "event2/buffer.h"
+#include <algorithm>
+
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <event2/http.h>
+
 
 using namespace std;
+
+struct file_msg{
+    int fd;
+    size_t offset;
+    size_t file_size;
+    string file_path;
+};
+
+struct my_argc{
+    int m_socket_fd{};
+
+    event_base *ev_base{};
+
+    struct event* ev{};
+
+    struct file_msg src_file;
+};
 
 class libevent
 {
@@ -29,23 +53,25 @@ public:
 private:
     bool init_socket();
 
-    struct my_argc{
-        int m_socket_fd;
-
-        event_base *ev_base;
-
-        struct event* ev;
-    };
+    bool get_src_file();
 
     static void callback_func(int fd, short event, void *arg);
 
+    static void write_cb(struct bufferevent *bev, void *arg);
+
+    static void read_cb(struct bufferevent *bev, void *arg);
+
+    static void event_cb(struct bufferevent *bev, short events,void *arg);
+
+
 private:
+
 
     int m_socket_fd;
 
     event_base *ev_base;
 
-    int m_src_file_fd;
+    file_msg m_file_msg;
 };
 
 
