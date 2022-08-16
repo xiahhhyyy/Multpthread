@@ -5,7 +5,8 @@
 #include "thread_pool.h"
 
 thread_pool::thread_pool(int thread_count):
-    m_thread_count(thread_count)
+    m_thread_count(thread_count),
+    cur_thread_count(0)
 {
     m_thread_id = new pthread_t[m_thread_count];
     m_thread_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -31,7 +32,9 @@ void thread_pool::start_thread_pool()
 void *thread_pool::call_func(void *param)
 {
     auto obj = (thread_pool*)param;
+    ++(obj->cur_thread_count);
     obj->work_thread();
+    --(obj->m_thread_count);
     return obj;
 }
 

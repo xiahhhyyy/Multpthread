@@ -20,6 +20,8 @@ protected:
 
     int m_thread_count;
 
+    int cur_thread_count;
+
     pthread_mutex_t m_thread_mutex{};
 
     pthread_cond_t m_thread_cond{};

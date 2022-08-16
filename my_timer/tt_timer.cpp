@@ -18,11 +18,21 @@ tt_timer::tt_timer()
 
 tt_timer::~tt_timer()
 {
-    eventfd_write(exit_fd, 1);
     exit = true;
+    eventfd_write(exit_fd, 1);
+    int i = 5;  //超时时间为5秒
+    while(i>0){
+        pthread_cond_broadcast(&m_thread_cond);
+        if(cur_thread_count == 0) break;
+        sleep(1);
+        --i;
+    }
+
+    if(cur_thread_count){
+        //异常处理
+    }
     close(epoll_fd);
     close(exit_fd);
-    m_set.clear();
 }
 
 void tt_timer::create_timer(const timer_data &data)
@@ -79,14 +89,17 @@ void tt_timer::tick()
     pthread_mutex_unlock(&m_thread_mutex);
 }
 
-
 void tt_timer::work_thread()
 {
     while(!exit){
         pthread_mutex_lock(&m_thread_mutex);
         time_t cur_time = time(nullptr);
-        while(m_set.empty() || m_set.begin()->trig_time > cur_time){
+        while((m_set.empty() || m_set.begin()->trig_time > cur_time)){
             pthread_cond_wait(&m_thread_cond, &m_thread_mutex);
+            if(exit){
+                pthread_mutex_unlock(&m_thread_mutex);
+                return;
+            }
             cur_time = time(nullptr);
         }
         timer_data data = *m_set.begin();
