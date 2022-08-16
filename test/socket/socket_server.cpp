@@ -7,7 +7,7 @@ socket_server::socket_server():
     m_accept_id(0),
     m_server_sockaddr{}
 {
-    m_sock_id = socket(PF_INET, SOCK_STREAM, 0);
+    m_sock_id = socket(PF_LOCAL, SOCK_STREAM, 0);
 }
 
 socket_server::~socket_server()
@@ -17,9 +17,11 @@ socket_server::~socket_server()
 
 void socket_server::set_listen_addr(const char *addr, uint16_t port)
 {
-    m_server_sockaddr.sin_family = AF_INET;
-    m_server_sockaddr.sin_port = htons(port);
-    inet_pton(AF_INET,addr,&m_server_sockaddr.sin_addr);
+
+    m_server_sockaddr.sun_family = AF_LOCAL;
+    strcpy(m_server_sockaddr.sun_path, "test_socket");
+    //m_server_sockaddr.sin_port = htons(port);
+    //inet_pton(AF_INET,addr,&m_server_sockaddr.sin_addr);
 
     //inet_aton(addr, &m_server_sockaddr.sin_addr);
 }
@@ -43,15 +45,16 @@ void socket_server::handle_request() const
     int i = 0;
     while(++i<100){
 
-        struct sockaddr_in client_addr{};
+        struct sockaddr_un client_addr{};
         socklen_t client_addr_len = sizeof(client_addr);
+        cout << "connect_fd = 1231231"<< endl;
         int connect_fd = accept(m_sock_id, (sockaddr*)&client_addr, &client_addr_len);
-
+        cout << "connect_fd = " << connect_fd << endl;
         memset(buf, 0, 1024);
         read(connect_fd, buf, 1023);
-        char* client_ip =  inet_ntoa(client_addr.sin_addr);
-        cout << "client_ip = " << client_ip << endl;
-        cout << "buf = " << buf << endl;
+        //char* client_ip =  inet_ntoa(client_addr.sin_addr);
+        //cout << "client_ip = " << client_ip << endl;
+        cout << "server buf = " << buf << endl;
 
         write(connect_fd, "xhy", 4);
         close(connect_fd);

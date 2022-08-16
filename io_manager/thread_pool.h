@@ -10,9 +10,7 @@
 class thread_pool
 {
 public:
-    thread_pool();
-
-    explicit thread_pool(int thread_count);
+    explicit thread_pool(int thread_count = 4);
 
     virtual ~thread_pool();
 protected:

@@ -14,6 +14,7 @@ void reactor::work_thread()
         client_data data = list_fd.front();
         list_fd.pop_front();
         pthread_mutex_unlock(&m_thread_mutex);
+
         m_event_handler->process_func(&data);
     }
 }

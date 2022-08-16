@@ -18,7 +18,16 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "algorithm"
+#include "vector"
 
 using namespace std;
+
+class aa{
+public:
+    aa() = default;
+    ~aa() = default;
+    void print();
+};
+void fast_sort(vector<int> &arr);
 
 #endif //XIAHHHYYY_COMMON_H

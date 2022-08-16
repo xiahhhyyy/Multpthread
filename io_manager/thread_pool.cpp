@@ -3,13 +3,6 @@
 //
 
 #include "thread_pool.h"
-thread_pool::thread_pool():
-    m_thread_count(5)
-{
-    m_thread_id = new pthread_t[m_thread_count];
-    m_thread_mutex = PTHREAD_MUTEX_INITIALIZER;
-    m_thread_cond = PTHREAD_COND_INITIALIZER;
-}
 
 thread_pool::thread_pool(int thread_count):
     m_thread_count(thread_count)

@@ -11,6 +11,7 @@
 #include <cerrno>
 #include <iostream>
 #include <unistd.h>
+#include "sys/un.h"
 using namespace std;
 
 class socket_server
@@ -31,7 +32,7 @@ private:
 
     int m_accept_id;
 
-    struct sockaddr_in m_server_sockaddr;
+    struct sockaddr_un m_server_sockaddr;
 
 };
 

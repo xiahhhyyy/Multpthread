@@ -10,6 +10,7 @@
 #include <cerrno>
 #include <iostream>
 #include <unistd.h>
+#include "sys/un.h"
 using namespace std;
 
 
@@ -26,7 +27,7 @@ public:
 
     bool connect_server()const;
 private:
-    sockaddr_in m_server_addr;
+    sockaddr_un m_server_addr;
     int m_socket_fd;
 
     int pthread_arr[5];

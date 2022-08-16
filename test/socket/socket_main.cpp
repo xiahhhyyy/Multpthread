@@ -22,7 +22,11 @@ int main(int argc, char** argv){
     fork();
 
     if(getpid() != parent_pid){
+        sleep(1);
         cout << "child pid = " << getpid() << endl;
+        socket_client client;
+        client.set_addr("11", 10);
+        client.connect_server();
         return 0;
     }else{
         cout << "ip = " << ip << endl;
