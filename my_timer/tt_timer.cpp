@@ -35,7 +35,7 @@ tt_timer::~tt_timer()
     close(exit_fd);
 }
 
-void tt_timer::create_timer(const timer_data &data)
+int tt_timer::create_timer(const timer_data &data)
 {
     pthread_mutex_lock(&m_thread_mutex);
     m_set.insert(data);

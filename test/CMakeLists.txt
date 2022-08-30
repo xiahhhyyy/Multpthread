@@ -3,5 +3,5 @@
 #add_subdirectory(epoll)
 add_subdirectory(socket)
 #add_subdirectory(timer)
-add_subdirectory(test)
+#add_subdirectory(test)
 add_subdirectory(libevent_client)

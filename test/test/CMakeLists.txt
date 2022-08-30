@@ -1,6 +1,8 @@
 project(test)
 cmake_minimum_required(VERSION 3.0)
 set(CMAKE_CXX_STANDARD 11)
-
+add_definitions(-D _GLIBCXX_USE_CXX11_ABI=0)
+include_directories(/root/client/include)
+link_directories("/root/client/lib/x86_64/")
 add_executable(test test.cpp)
-target_link_libraries(test libpthread.so)
+target_link_libraries(test pthread jsoncpp)

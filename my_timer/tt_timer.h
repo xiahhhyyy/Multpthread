@@ -16,6 +16,7 @@
 #include <cerrno>
 #include "thread_pool.h"
 #include "unordered_set"
+#include "unordered_map"
 #include "set"
 
 using namespace std;
@@ -25,7 +26,8 @@ struct timer_data
     void (*cb_func)(tt_timer *obj, void* arg);
     void *arg;
     time_t trig_time;
-    timer_data():arg(nullptr),cb_func(nullptr),trig_time(0){}
+    time_t timeT;
+    timer_data():arg(nullptr),cb_func(nullptr),trig_time(0),timeT(0){}
     bool operator<(const timer_data &obj) const{
         return this->trig_time < obj.trig_time;
     }
@@ -39,7 +41,8 @@ public:
 
     ~tt_timer() override;
 
-    void create_timer(const timer_data &data);
+    int create_timer(const timer_data &data);
+
 
 private:
     void tick();
@@ -60,7 +63,11 @@ private:
 
     int exit_fd;
 
+    list<timer_data> m_list;
+
     multiset<timer_data> m_set;
+
+    map<int, multiset<timer_data>::iterator> m_map;
 };
 
 

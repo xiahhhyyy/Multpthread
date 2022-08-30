@@ -4,48 +4,17 @@
 #include "common.h"
 #include "my_shared_ptr.h"
 #include "memory"
-
-class cl2;
-class cl1
-{
-public:
-    cl1()= default;;
-    ~cl1() = default;
-     shared_ptr<cl2> cl2_ptr;
-    string str;
-};
-
-class cl2
-{
-public:
-    cl2() = default;
-    ~cl2() = default;
-    weak_ptr<cl1> cl1_ptr;
-    string str;
-};
-
-
+#include "CMicInteger.h"
+#include "pthread.h"
+#include "json/json.h"
 
 
 int main(){
 
-    shared_ptr<cl2> bb(new cl2);
-    bb->str = "bb";
-    {
-        shared_ptr<cl1> aa(new cl1);
-        aa->str = "bb";
-        aa->cl2_ptr = bb;
-        bb->cl1_ptr = aa;
-        shared_ptr<cl1> cc = bb->cl1_ptr.lock();
-    }
+    CMicInteger<int> xhy;
+    xhy = 100;
 
-    cout << (bb->cl1_ptr)->str << endl;
-
-
-
-
-
-
+    int aa =xhy.GetValue();
 
 
     return 0;
